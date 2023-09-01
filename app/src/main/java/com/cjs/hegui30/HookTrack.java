@@ -1,10 +1,10 @@
 package com.cjs.hegui30;
 
-import android.app.PendingIntent;
 import android.content.ContentResolver;
-import android.location.Criteria;
+import android.content.pm.PackageManager;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Looper;
 import android.util.Log;
 
@@ -30,7 +30,9 @@ public class HookTrack implements IXposedHookLoadPackage {
             "com.cjs.drv",
             "com.bw30.zsch",
             "com.bw30.zsch.magic",
-            "com.cjs.hegui30.demo"
+            "com.cjs.hegui30.demo",
+            "com.hbxj.haidai",
+            "com.xht.privacytest"
     };
 
     @Override
@@ -201,41 +203,104 @@ public class HookTrack implements IXposedHookLoadPackage {
                 }
         );
 
-      XposedHelpers.findAndHookMethod(
-          "android.app.ActivityManager",
-          lpparam.classLoader,
-          "getRunningAppProcesses",
-          new DumpMethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
-              XposedBridge.log(lpparam.packageName + "调用getRunningAppProcesses()获取了正在运行的App");
-            }
-          }
-      );
+        XposedHelpers.findAndHookMethod(
+                "android.app.ActivityManager",
+                lpparam.classLoader,
+                "getRunningAppProcesses",
+                new DumpMethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) {
+                        XposedBridge.log(lpparam.packageName + "调用getRunningAppProcesses()获取了正在运行的App");
+                    }
+                }
+        );
 
 
-      XposedHelpers.findAndHookMethod(
-          "android.app.ApplicationPackageManager",
-          lpparam.classLoader,
-          "getInstalledPackages", int.class,
-          new DumpMethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
-              XposedBridge.log(lpparam.packageName + "调用getInstalledPackages()获取了当前用户安装的所有软件包的列表");
-            }
-          }
-      );
+        XposedHelpers.findAndHookMethod(
+                "android.app.ApplicationPackageManager",
+                lpparam.classLoader,
+                "getInstalledPackages", int.class,
+                new DumpMethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) {
+                        XposedBridge.log(lpparam.packageName + "调用getInstalledPackages()获取了当前用户安装的所有软件包的列表");
+                    }
+                }
+        );
 
-      XposedHelpers.findAndHookMethod(
-          "android.app.ApplicationPackageManager",
-          lpparam.classLoader,
-          "getInstalledApplications", int.class,
-          new DumpMethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) {
-              XposedBridge.log(lpparam.packageName + "调用getInstalledApplications()获取了当前用户安装的所有应用程序包的列表");
-            }
-          }
-      );
+        XposedHelpers.findAndHookMethod(
+                "android.app.ApplicationPackageManager",
+                lpparam.classLoader,
+                "getInstalledApplications", int.class,
+                new DumpMethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) {
+                        XposedBridge.log(lpparam.packageName + "调用getInstalledApplications()获取了当前用户安装的所有应用程序包的列表");
+                    }
+                }
+        );
+
+        XposedHelpers.findAndHookMethod(
+                "com.xht.privacytest.MainActivity",
+                lpparam.classLoader,
+                "testMethod", String.class,
+                new DumpMethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) {
+                        XposedBridge.log(lpparam.packageName + "------调用testMethod()做个测试------");
+                    }
+                }
+        );
+
+        XposedHelpers.findAndHookMethod(
+                PackageManager.class.getName(),
+                lpparam.classLoader,
+                "getPackageInfo",
+                String.class, int.class,
+                new DumpMethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) {
+                        XposedBridge.log(lpparam.packageName + "调用getPackageInfo获取了应用信息");
+                    }
+                }
+        );
+
+        XposedHelpers.findAndHookMethod(
+                "android.os.SystemProperties",
+                lpparam.classLoader,
+                "get",
+                String.class,
+                new DumpMethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) {
+                        XposedBridge.log(lpparam.packageName + "调用SystemProperties获取设备序列号");
+                    }
+                }
+        );
+
+        XposedHelpers.findAndHookMethod(
+                Build.class.getName(),
+                lpparam.classLoader,
+                "getSerial",
+                new DumpMethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) {
+                        XposedBridge.log(lpparam.packageName + "调用getSerial获取设备设备序列号");
+                    }
+                }
+        );
+
+        XposedHelpers.findAndHookMethod(
+                "android.app.ApplicationPackageManager",
+                lpparam.classLoader,
+                "getPackageInfoAsUser",
+                new DumpMethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        XposedBridge.log(lpparam.packageName + "调用getPackageInfoAsUser读取已安装APP信息");
+                    }
+                }
+        );
+
     }
 }
